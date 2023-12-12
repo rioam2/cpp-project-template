@@ -10,6 +10,9 @@ compile_commands.json
 # CLion
 .idea
 
+# VSCode
+.vscode
+
 # other
 _build
 tmp
