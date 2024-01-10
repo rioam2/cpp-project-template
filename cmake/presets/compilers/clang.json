@@ -7,6 +7,9 @@
       "environment": {
         "CC": "clang",
         "CXX": "clang++"
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++"
       }
     },
     {

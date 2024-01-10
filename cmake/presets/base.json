@@ -39,7 +39,8 @@
       "execution": {
         "noTestsAction": "error",
         "stopOnFailure": true
-      }
+      },
+      "configuration": "Debug"
     }
   ]
 }
