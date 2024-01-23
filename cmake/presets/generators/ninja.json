@@ -9,11 +9,7 @@
     {
       "name": "ninja-multi-config",
       "hidden": true,
-      "generator": "Ninja Multi-Config",
-      "cacheVariables": {
-        "CMAKE_DEFAULT_CONFIGS": "Debug;Release;RelWithDebInfo",
-        "CMAKE_CROSS_CONFIGS": "Debug;Release;RelWithDebInfo"
-      }
+      "generator": "Ninja Multi-Config"
     }
   ],
   "buildPresets": [
@@ -24,7 +20,8 @@
     {
       "name": "ninja-multi-config",
       "hidden": true,
-      "configurePreset": "ninja-multi-config"
+      "configurePreset": "ninja-multi-config",
+      "configuration": "Debug"
     }
   ],
   "testPresets": [
@@ -36,7 +33,8 @@
     {
       "name": "ninja-multi-config",
       "hidden": true,
-      "configurePreset": "ninja-multi-config"
+      "configurePreset": "ninja-multi-config",
+      "configuration": "Debug"
     }
   ]
 }
