@@ -81,6 +81,7 @@ function(add_@cpp_pt_cmake@_module module_name)
     set(module_target_wasm "${module_target}_wasm")
     add_executable(${module_target_wasm} ${ARGN})
     set_target_properties(${module_target_wasm} PROPERTIES OUTPUT_NAME "lib@cpp_pt_cmake@-${module_name}.wasm")
+    set_@cpp_pt_cmake@_target_properties(${module_target_wasm} ${module_type})
     target_include_directories(
       ${module_target_wasm} ${module_type}
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
