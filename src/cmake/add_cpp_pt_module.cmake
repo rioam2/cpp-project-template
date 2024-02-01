@@ -18,13 +18,13 @@ function(_@cpp_pt_cmake@_module_generate_export_headers target)
 
   if (WASI)
     file(APPEND ${export_file} "\
-      \n#ifndef WASM_EXPORT\
-      \n#define WASM_EXPORT(name) extern \"C\" __attribute__((export_name(name)))\
+      \n#ifndef WASI_EXPORT\
+      \n#define WASI_EXPORT(name) extern \"C\" __attribute__((export_name(name)))\
       \n#endif")
   else ()
     file(APPEND ${export_file} "\
-      \n#ifndef WASM_EXPORT\
-      \n#define WASM_EXPORT(name)\
+      \n#ifndef WASI_EXPORT\
+      \n#define WASI_EXPORT(name)\
       \n#endif")
   endif ()
 
@@ -76,26 +76,4 @@ function(add_@cpp_pt_cmake@_module module_name)
       ${module_target}
       PARENT_SCOPE
   )
-
-  if(WASI)
-    set(module_target_wasm "${module_target}_wasm")
-    add_executable(${module_target_wasm} ${ARGN})
-    set_target_properties(${module_target_wasm} PROPERTIES OUTPUT_NAME "lib@cpp_pt_cmake@-${module_name}.wasm")
-    set_@cpp_pt_cmake@_target_properties(${module_target_wasm} ${module_type})
-    target_include_directories(
-      ${module_target_wasm} ${module_type}
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-    target_link_options(
-      ${module_target_wasm} PUBLIC 
-      -nostartfiles 
-      -Wl,--no-entry
-    )
-    set(@cpp_pt_cmake@_module_target_wasm
-      ${module_target_wasm}
-      PARENT_SCOPE
-    )
-  endif()
 endfunction()

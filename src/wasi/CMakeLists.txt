@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright 2023 Mikhail Svetkin
+# SPDX-License-Identifier: MIT
+
+add_@cpp_pt_cmake@_executable(wasi)
+
+target_sources(${@cpp_pt_cmake@_executable_target} PRIVATE src/interface.cpp)
+
+target_link_libraries(${@cpp_pt_cmake@_executable_target}
+  PRIVATE
+    @cpp_pt_name@::@cpp_pt_module@
+)
+
+set_target_properties(${@cpp_pt_cmake@_executable_target} PROPERTIES OUTPUT_NAME "lib@cpp_pt_cmake@.wasm")
+target_link_options(${@cpp_pt_cmake@_executable_target} PUBLIC -nostartfiles -Wl,--no-entry)
