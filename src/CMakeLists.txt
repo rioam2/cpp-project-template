@@ -9,6 +9,13 @@ project(
   LANGUAGES CXX
 )
 
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    add_compile_options("-stdlib=libc++")
+  endif()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include(@cpp_pt_name@-install-targets)
