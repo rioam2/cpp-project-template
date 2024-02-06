@@ -21,6 +21,8 @@ function(set_@cpp_pt_cmake@_target_properties target type)
     target_compile_options(${target} ${type}
       $<$<CXX_COMPILER_ID:MSVC>:/W4>
       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+      $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
+      $<$<AND:$<PLATFORM_ID:Linux>,$<CXX_COMPILER_ID:Clang>>:-stdlib=libc++>
     )
   endif()
 
