@@ -41,7 +41,7 @@ jobs:
         cmake --workflow --preset ${{matrix.target.preset}}
 
     - name: Upload vcpkg error logs
-      if: ${{ steps.cmake-workflow.outcome == 'failure' }}
+      if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: logs-${{matrix.target.preset}}
