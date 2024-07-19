@@ -10,6 +10,14 @@ endif()
 
 unset(IN_TRY_COMPILE)
 
+# Check clang version
+set(REQUIRED_CLANG_VERSION "17.0.0")
+execute_process(COMMAND clang --version OUTPUT_VARIABLE CLANG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+" CLANG_VERSION "${CLANG_VERSION}")
+if (CLANG_VERSION VERSION_LESS REQUIRED_CLANG_VERSION)
+  message(FATAL_ERROR "Clang must be version ${REQUIRED_CLANG_VERSION} or greater to compile for wasm32-wasi. Current Clang version: ${CLANG_VERSION}")
+endif()
+
 # Until Platform/WASI.cmake is upstream we need to inject the path to it
 # into CMAKE_MODULE_PATH.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
@@ -18,6 +26,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/wasi-sdk_bootstrap.cmake)
 wasi_sdk_bootstrap(
   TAG wasi-sdk-21 
   WASI_SYSROOT_OUTPUT CMAKE_SYSROOT
+  WASI_RESOURCE_DIR_OUTPUT WASI_RESOURCE_DIR
+  CLANG_DEFAULT_RESOURCE_DIR_OUTPUT CLANG_DEFAULT_RESOURCE_DIR
 )
 
 set(CMAKE_SYSTEM_NAME WASI)
@@ -41,12 +51,29 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
+# Use compiler-rt builtins (provided by wasi-sdk)
 set(CLANG_DEFAULT_RTLIB "compiler-rt")
 set(LIBCXX_USE_COMPILER_RT "YES")
 set(LIBCXXABI_USE_COMPILER_RT "YES")
 
+# Global compiler flags - all targets should use compiler-rt builtins from wasi-sdk
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -resource-dir=${WASI_RESOURCE_DIR} --include-directory-after ${CLANG_DEFAULT_RESOURCE_DIR}/include")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -resource-dir=${WASI_RESOURCE_DIR} --include-directory-after ${CLANG_DEFAULT_RESOURCE_DIR}/include")
+
+# Project compiler flags
 add_compile_options(
-  "-stdlib=libc++" 
-  "-fno-exceptions" 
-  "-D_WASI_EMULATED_SIGNAL"
+  -stdlib=libc++
+  -fno-exceptions
+  -D_WASI_EMULATED_SIGNAL
+  -D_WASI_EMULATED_PROCESS_CLOCKS
+  -D_WASI_EMULATED_MMAN
+  -D_WASI_EMULATED_GETPID
+)
+
+# Project linker flags
+add_link_options(
+  -lwasi-emulated-signal
+  -lwasi-emulated-mman
+  -lwasi-emulated-process-clocks
+  -lwasi-emulated-getpid
 )

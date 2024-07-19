@@ -17,7 +17,7 @@ function(wasi_sdk_bootstrap)
   cmake_parse_arguments(
     PARSE_ARGV 0 "arg"
     ""
-    "TAG;WASI_SYSROOT_OUTPUT"
+    "TAG;WASI_SYSROOT_OUTPUT;WASI_RESOURCE_DIR_OUTPUT;CLANG_DEFAULT_RESOURCE_DIR_OUTPUT"
     ""
   )
   if (DEFINED arg_UNPARSED_ARGUMENTS)
@@ -97,26 +97,23 @@ function(wasi_sdk_bootstrap)
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E tar xzf ${wasi_sdk_libclang_tarball_path}
     WORKING_DIRECTORY ${wasi_sdk_root}
-    )
-
-  # Move wasi-sdk libclang runtime builtins to clang resource directory
-  execute_process(COMMAND clang --print-resource-dir OUTPUT_VARIABLE clang_resource_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
-  message(STATUS "Moving wasi-sdk libclang runtime builtins to ${clang_resource_dir}")
-  if (NOT EXISTS "${clang_resource_dir}/lib/wasi")
-      message(STATUS "Creating wasi-sdk libclang runtime builtin directory: ${clang_resource_dir}/lib/wasi")
-      file(MAKE_DIRECTORY "${clang_resource_dir}/lib/wasi")
-  endif()
-  file(
-    COPY_FILE "${wasi_sdk_root}/lib/wasi/libclang_rt.builtins-wasm32.a" "${clang_resource_dir}/lib/wasi/libclang_rt.builtins-wasm32.a" 
-    ONLY_IF_DIFFERENT
-    RESULT wasi_sdk_runtime_copy_failed
   )
-  if (wasi_sdk_runtime_copy_failed)
-    message(FATAL_ERROR "Moving wasi-sdk libclang runtime builtins to ${wasi_sdk_root}/lib/wasi failed. \n${wasi_sdk_runtime_copy_failed}\n")
-  endif()
+
+  # Retrieve clang resource directory
+  execute_process(COMMAND clang --print-resource-dir OUTPUT_VARIABLE CLANG_DEFAULT_RESOURCE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   set(${arg_WASI_SYSROOT_OUTPUT}
       "${wasi_sdk_root}/wasi-sysroot"
+      PARENT_SCOPE
+  )
+
+  set(${arg_WASI_RESOURCE_DIR_OUTPUT}
+      "${wasi_sdk_root}"
+      PARENT_SCOPE
+  )
+
+  set(${arg_CLANG_DEFAULT_RESOURCE_DIR_OUTPUT}
+      "${CLANG_DEFAULT_RESOURCE_DIR}"
       PARENT_SCOPE
   )
 endfunction()
